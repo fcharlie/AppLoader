@@ -1,0 +1,17 @@
+[Description]
+Title="App Loader"
+Author="Force.Charlie"
+Last="20160327"
+
+[Base]
+Executable="/path/app"
+InitializeScript="/path/initializeScript.bat"
+Icon="/path/to/app/icon"
+Path=[
+	"/path/to/cmake",
+	"/path/to/git"
+]
+Args=[
+    "",
+    ""
+]
