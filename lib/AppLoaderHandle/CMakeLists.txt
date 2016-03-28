@@ -7,6 +7,7 @@ add_library(AppLoaderHandle
 )
 
 target_link_libraries(AppLoaderHandle
+    AppLoader
     kernel32
     user32
 )
