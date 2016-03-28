@@ -5,7 +5,7 @@
 *.obj
 *.pdb
 *.res
-
+build/
 # Precompiled Headers
 *.gch
 *.pch
