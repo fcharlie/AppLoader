@@ -7,9 +7,9 @@ add_executable(AppLoader WIN32
     PowerShellExecute.cc
     Executable.cc
     Process.cc
+    main.cc
     AppLoader.rc
     AppLoader.manifest
-    main.cc
 )
 
 target_link_libraries(AppLoader

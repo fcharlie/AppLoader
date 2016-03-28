@@ -3,4 +3,5 @@ project(AppLoader)
 
 add_library(libAppLoader STATIC
     AppLoader.cc
+	WideTOML.cc
 )

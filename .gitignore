@@ -5,6 +5,7 @@
 *.obj
 *.pdb
 *.res
+*.suo
 build/
 # Precompiled Headers
 *.gch
@@ -28,3 +29,8 @@ build/
 *.exe
 *.out
 *.app
+ipch
+Debug
+Release
+x64
+ARM

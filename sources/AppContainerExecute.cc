@@ -7,7 +7,8 @@
 #include "Executable.hpp"
 #include "Execute.hpp"
 
-int AppContainerExecute(const std::wstring &file, const std::wstring &args) {
+int AppContainerExecute(const ExecutableFile &exe)
+{
   ///
   return 0;
 }

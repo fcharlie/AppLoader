@@ -14,6 +14,7 @@ if(NOT WIN32)
     message(FATAL_ERROR "This Project only support Windows")
 endif()
 
+add_definitions(-DUNICODE -D_UNICODE)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 include_directories(
