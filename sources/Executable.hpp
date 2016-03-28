@@ -23,6 +23,10 @@ public:
   const std::vector<std::wstring> &Path() const { return path_; }
   std::vector<std::wstring> &Args() { return args_; }
   const std::vector<std::wstring> &Args() const { return args_; }
+  void AppContainerEnable(bool isEnable = true) { isAppContainer = isEnable; }
+  bool IsEnableAppContainer() { return isAppContainer; }
+  void AdministratorEnable(bool isEnable = true) { isAdministrator = isEnable; }
+  bool IsEnableAdministrator() { return isAdministrator; }
   int Execute();
 
 private:
@@ -30,6 +34,8 @@ private:
   std::wstring initializeScript_;
   std::vector<std::wstring> path_;
   std::vector<std::wstring> args_;
+  bool isAppContainer = false;
+  bool isAdministrator = false;
 };
 
 #endif

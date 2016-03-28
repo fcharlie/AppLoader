@@ -15,3 +15,6 @@ Args=[
     "",
     ""
 ]
+## StartupLevel="AppContainer or Administrator"
+IsAdministrator=false
+IsAppContainer=false
