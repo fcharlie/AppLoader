@@ -3,6 +3,7 @@ project(AppLoaderExe)
 
 add_executable(AppLoader WIN32
     AppContainerExecute.cc
+    Precompiled.cc
     BatchExecute.cc
     PowerShellExecute.cc
     Executable.cc
@@ -21,4 +22,5 @@ target_link_libraries(AppLoader
     gdi32
     comctl32
     shlwapi
+    Userenv
 )
