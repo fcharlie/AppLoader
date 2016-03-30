@@ -7,6 +7,7 @@ add_executable(AppLoader WIN32
     BatchExecute.cc
     PowerShellExecute.cc
     Executable.cc
+	Environment.cc
     Process.cc
     main.cc
     AppLoader.rc

@@ -81,6 +81,9 @@ private:
 
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int) {
   int Argc = 0;
+  wchar_t buf[4096];
+  uint32_t counts;
+  FasterResolveIcon(LR"(F:\Development\AppLoader\App.apploader)", buf, &counts);
   ArgvCase argvCase = CommandLineToArgvW(GetCommandLineW(), &Argc);
   if (Argc < 2) {
     PrintUsage();
