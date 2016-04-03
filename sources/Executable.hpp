@@ -19,6 +19,8 @@ public:
   const std::wstring &Executable() const { return executable_; }
   std::wstring &InitializeScript() { return initializeScript_; }
   const std::wstring &InitializeScript() const { return initializeScript_; }
+  const std::wstring &StartupDir()const { return startupDir_; }
+  std::wstring &StartupDir() { return startupDir_; }
   std::vector<std::wstring> &Path() { return path_; }
   const std::vector<std::wstring> &Path() const { return path_; }
   std::vector<std::wstring> &Args() { return args_; }
@@ -32,6 +34,7 @@ public:
 private:
   std::wstring executable_;
   std::wstring initializeScript_;
+  std::wstring startupDir_;
   std::vector<std::wstring> path_;
   std::vector<std::wstring> args_;
   bool isAppContainer = false;

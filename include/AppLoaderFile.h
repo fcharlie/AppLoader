@@ -69,6 +69,25 @@ private:
 	}item;
 };
 
+
+/*
+inline N WINAPI AtlAlignUp(
+_In_ N n,
+_In_ ULONG nAlign) throw()
+{
+return( N( (n+(nAlign-1))&~(N( nAlign )-1) ) );
+}
+
+template< typename N >
+inline N WINAPI AtlAlignDown(
+_In_ N n,
+_In_ ULONG nAlign) throw()
+{
+return( N( n&~(N( nAlign )-1) ) );
+}
+
+*/
+
 class AppLoaderFile {
 public:
   AppLoaderFile(const wchar_t *file);

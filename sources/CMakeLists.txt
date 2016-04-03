@@ -16,6 +16,7 @@ add_executable(AppLoader WIN32
 
 target_link_libraries(AppLoader
     libAppLoader
+	Pathcch.lib
     kernel32
     advapi32
     shell32

@@ -13,6 +13,7 @@
 ///
 #include "Executable.hpp"
 #include "Execute.hpp"
+#include "Environment.hpp"
 
 void PrintUsage() {
   ///
@@ -84,6 +85,8 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int) {
   wchar_t buf[4096];
   uint32_t counts;
   FasterResolveIcon(LR"(F:\Development\AppLoader\App.apploader)", buf, &counts);
+  AppLoaderEnvironment appLoaderEnvironment;
+  appLoaderEnvironment.Initialize(LR"(App.apploader)");
   ArgvCase argvCase = CommandLineToArgvW(GetCommandLineW(), &Argc);
   if (Argc < 2) {
     PrintUsage();

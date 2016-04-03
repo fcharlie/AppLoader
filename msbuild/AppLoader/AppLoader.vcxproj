@@ -60,7 +60,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Shlwapi.lib;Comctl32.lib;Userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;Comctl32.lib;Userenv.lib;Pathcch.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -80,12 +80,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Shlwapi.lib;Comctl32.lib;Userenv.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;Comctl32.lib;Userenv.lib;Pathcch.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sources\AppContainerExecute.cc" />
     <ClCompile Include="..\..\sources\BatchExecute.cc" />
+    <ClCompile Include="..\..\sources\Environment.cc" />
     <ClCompile Include="..\..\sources\Executable.cc" />
     <ClCompile Include="..\..\sources\main.cc" />
     <ClCompile Include="..\..\sources\PowerShellExecute.cc" />
@@ -93,6 +94,7 @@
     <ClCompile Include="..\..\sources\Process.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\sources\Environment.hpp" />
     <ClInclude Include="..\..\sources\Executable.hpp" />
     <ClInclude Include="..\..\sources\Execute.hpp" />
     <ClInclude Include="..\..\sources\Precompiled.h" />
