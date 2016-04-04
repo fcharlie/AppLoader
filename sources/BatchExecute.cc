@@ -3,13 +3,14 @@
 #include "Precompiled.h"
 ////
 #include <stdint.h>
+#include <Pathcch.h>
+#include <Shellapi.h>
 ///
 #include "Environment.hpp"
 #include "Executable.hpp"
 #include "Execute.hpp"
 //
-#include <Pathcch.h>
-#include <Shellapi.h>
+
 
 class CharactersConvert {
 public:
@@ -156,7 +157,7 @@ int BatchAttachExecute(const ExecutableFile &exe) {
   CharactersConvert cs(start.data());
   batchFileBuilder.Write(cs.Ptr(), cs.Length());
   batchFileBuilder.Flush(); // flush buffer to disk
-  WCHAR maxCmd[PATHCCH_MAX_CCH] = L"cmd /c \"";
+  WCHAR maxCmd[PATHCCH_MAX_CCH] = L"/c \"";
   wcscat_s(maxCmd, batchFileBuilder.Path());
   wcscat_s(maxCmd, L"\"");
   SHELLEXECUTEINFOW sei;
@@ -164,6 +165,7 @@ int BatchAttachExecute(const ExecutableFile &exe) {
   sei.cbSize = sizeof(sei);
   sei.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
   sei.lpVerb = exe.IsEnableAdministrator() ? L"runas" : L"open";
+  sei.lpFile = L"cmd";
   sei.lpParameters = maxCmd;
   if (StringEndWith(exe.Executable(), L".exe") == 0) {
     sei.nShow = SW_HIDE;
