@@ -33,6 +33,8 @@ inline void MemoryFree(void* ptr)
 bool EnvironmentPathBuilder(std::wstring &paths)
 {
 	WCHAR maxBuf[MAX_PATH] = { 0 };
+	// Because Windows support Install other disk partition. 
+	// so your should find WINDIR from Registry or Environment
 	auto ret=GetEnvironmentVariableW(L"WINDIR", maxBuf, MAX_PATH);
 	if (ret == 0)
 		return false;
@@ -41,7 +43,7 @@ bool EnvironmentPathBuilder(std::wstring &paths)
 	paths.append(maxBuf);
 	paths.push_back(';');
 	paths.append(maxBuf);
-	paths.append(L"\\System32\Wbem;");
+	paths.append(L"\\System32\\Wbem;");
 	paths.append(maxBuf);
 	paths.append(L"\\System32\\WindowsPowerShell\\v1.0;");
 	return true;

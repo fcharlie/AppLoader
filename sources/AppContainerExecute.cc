@@ -13,6 +13,7 @@
 #include <vector>
 
 ////
+#include "Environment.hpp"
 #include "Executable.hpp"
 #include "Execute.hpp"
 
@@ -146,9 +147,26 @@ Cleanup:
 }
 
 int AppContainerExecute(const ExecutableFile &exe) {
-  ///
-  if (exe.Path().size() > 0) {
-    //
+  AppLoaderEnvironmentStrings aes;
+  if (aes.InitializeEnvironment()) {
+    return 1;
   }
+  if (exe.Path().size() > 0) {
+	  std::wstring path_;
+	  for (auto &p : exe.Path()) {
+		  path_.append(p);
+		  path_.push_back(';');
+	  }
+	  if (exe.IsClearEnvironment()) {
+		  std::wstring paths;
+		  if (!EnvironmentPathBuilder(paths))
+			  return 1;
+		  paths.append(path_);
+		  aes.Replace(L"PATH", paths);
+	  } else {
+		  aes.Insert(L"PATH", path_);
+	  }
+  }
+  /// TO USE Create Environment
   return 0;
 }

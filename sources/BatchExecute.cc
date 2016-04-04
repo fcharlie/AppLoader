@@ -4,6 +4,7 @@
 ////
 #include <stdint.h>
 ///
+#include "Environment.hpp"
 #include "Executable.hpp"
 #include "Execute.hpp"
 //
@@ -105,6 +106,14 @@ int BatchAttachExecute(const ExecutableFile &exe) {
   inits.append(L" \n");
   CharactersConvert civ(inits.data());
   batchFileBuilder.Write(civ.Ptr(), civ.Length());
+  std::wstring wenv;
+  if (exe.IsClearEnvironment()) {
+    if (!EnvironmentPathBuilder(wenv)) {
+      return 2;
+    }
+  } else {
+    wenv.assign(L"%PATH%;");
+  }
   auto &path = exe.Path();
   if (path.size()) {
     std::wstring ws = L"set PATH=";
@@ -114,7 +123,8 @@ int BatchAttachExecute(const ExecutableFile &exe) {
       s.push_back(L';');
     }
     ws.append(s);
-    ws.append(L"%PATH%  \n");
+    ws.append(wenv);
+    ws.append(L" \n");
     CharactersConvert cv(ws.data());
     batchFileBuilder.Write(cv.Ptr(), cv.Length());
   }
@@ -155,10 +165,10 @@ int BatchAttachExecute(const ExecutableFile &exe) {
   sei.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
   sei.lpVerb = exe.IsEnableAdministrator() ? L"runas" : L"open";
   sei.lpParameters = maxCmd;
-  if (StringEndWith(exe.Executable(), L".exe")==0) {
-	  sei.nShow = SW_HIDE;
+  if (StringEndWith(exe.Executable(), L".exe") == 0) {
+    sei.nShow = SW_HIDE;
   } else {
-	  sei.nShow = SW_SHOW;
+    sei.nShow = SW_SHOW;
   }
   if (ShellExecuteExW(&sei) == FALSE) {
     return GetLastError();

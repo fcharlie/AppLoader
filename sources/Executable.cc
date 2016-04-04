@@ -41,5 +41,5 @@ int ExecutableFile::Execute() {
   if (isAppContainer) {
     return AppContainerExecute(*this);
   }
-  return NativeProcessExecute(*this);
+  return ProcessExecute(*this);
 }

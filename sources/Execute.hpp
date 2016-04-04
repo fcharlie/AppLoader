@@ -10,6 +10,6 @@
 int AppContainerExecute(const ExecutableFile &exe);
 int PowerShellAttachExecute(const ExecutableFile &exe);
 int BatchAttachExecute(const ExecutableFile &exe);
-int NativeProcessExecute(const ExecutableFile &file);
+int ProcessExecute(const ExecutableFile &file);
 
 #endif
