@@ -8,6 +8,15 @@
 #include "Executable.hpp"
 #include "Execute.hpp"
 
+bool StringEndWith(const std::wstring &s, const wchar_t *subfix) {
+  auto l = wcslen(subfix);
+  if (s.size() < l)
+    return false;
+  if (s.compare(s.size() - l, l, subfix) == 0)
+    return true;
+  return false;
+}
+
 inline bool IsMatchBatch(const std::wstring &script) {
   // [.](bat|cmd)$
   std::wregex pattern(LR"([.](bat|cmd)$)");

@@ -10,6 +10,130 @@
 #include <algorithm>
 ///
 #include "Environment.hpp"
+
+template<class TBase>
+inline TBase* ZeroMemoryAlloc(size_t n)
+{
+	TBase *Ptr = reinterpret_cast<TBase*>(malloc(sizeof(TBase)*n));
+	if (Ptr) {
+		memset(Ptr, 0, sizeof(TBase)*n);
+	}
+	return Ptr;
+}
+
+inline void MemoryFree(void* ptr)
+{
+	free(ptr);
+}
+
+AppLoaderEnvironmentStrings::AppLoaderEnvironmentStrings() :envbuf(nullptr)
+{
+	///
+}
+
+AppLoaderEnvironmentStrings::~AppLoaderEnvironmentStrings()
+{
+	if (envbuf) {
+		/// to do Remove
+		//HeapFree(GetProcessHeap(), 0, envbuf);
+		MemoryFree(envbuf);
+	}
+}
+
+bool AppLoaderEnvironmentStrings::InitializeEnvironment()
+{
+	auto env = GetEnvironmentStringsW();
+	if (env == nullptr) return false;
+	wchar_t *pl=nullptr;
+	for (pl = env; *pl; pl++) {
+		envlist.push_back(pl);
+		pl += wcslen(pl);
+	}
+	FreeEnvironmentStringsW(env);
+	return true;
+}
+const wchar_t *AppLoaderEnvironmentStrings::EnvironmentBuilder()
+{
+	if (envbuf && updateCount == lastBuilderCount)
+		return envbuf;
+	size_t length = 0;
+	for (auto &c : envlist) {
+		length += c.size() + 1;
+	}
+	length++;
+	wchar_t *NewBuf = ZeroMemoryAlloc<wchar_t>(length);
+	wchar_t *Offbuf = NewBuf;
+	for (auto &c : envlist) {
+		wmemcpy(Offbuf, c.data(), c.size());
+		Offbuf += c.size()+1;
+	}
+	*Offbuf = 0;
+	lastBuilderCount = updateCount;
+	if (envbuf) {
+		MemoryFree(envbuf);
+		envbuf = NewBuf;
+	} else {
+		envbuf = NewBuf;
+	}
+	return envbuf;
+}
+
+bool AppLoaderEnvironmentStrings::Delete(const wchar_t *key)
+{
+	std::wstring key_(key);
+	key_.push_back('=');
+	for (auto iter = envlist.begin();iter != envlist.end(); iter++) {
+		if ((*iter).compare(0, key_.size(), key_.data()) == 0) {
+			envlist.erase(iter);
+			updateCount++;
+			return true;
+		}
+	}
+	return false;
+}
+bool AppLoaderEnvironmentStrings::Append(const wchar_t *key, const std::wstring &va)
+{
+	std::wstring key_(key);
+	key_.push_back('=');
+	for (auto iter = envlist.begin(); iter != envlist.end(); iter++) {
+		if (iter->compare(0, key_.size(), key_.data()) == 0) {
+			iter->push_back(L';');
+			iter->append(va);
+			updateCount++;
+			return true;
+		}
+	}
+	return true;
+}
+
+bool AppLoaderEnvironmentStrings::Insert(const wchar_t *key, const std::wstring &va)
+{
+	std::wstring key_(key);
+	key_.push_back('=');
+	for (auto iter = envlist.begin(); iter != envlist.end(); iter++) {
+		if (iter->compare(0, key_.size(), key_.data()) == 0) {
+			iter->insert(key_.size(), va.data());
+			updateCount++;
+			return true;
+		}
+	}
+	return true;
+}
+
+bool AppLoaderEnvironmentStrings::Replace(const wchar_t *key, const std::wstring &va)
+{
+	std::wstring key_(key);
+	key_.push_back('=');
+	for (auto iter = envlist.begin(); iter != envlist.end(); iter++) {
+		if (iter->compare(0, key_.size(), key_.data()) == 0) {
+			iter->replace(key_.size(), iter->size() - key_.size(), va.data());
+			updateCount++;
+			return true;
+		}
+	}
+	return true;
+}
+
 //DoEnvironmentSubstW
 //ExpandEnvironmentStringsW
 //PathProcessCommand
@@ -62,7 +186,15 @@ bool AppLoaderEnvironment::DoEnvironmentSubst(std::wstring &str)
 	auto end = begin + str.size();
 	for (; begin < end; begin++) {
 		if (*begin == '$') {
-			while (++begin < end) {
+			if (++begin >= end) {
+				return false;
+			} 
+			if (*begin != '{') {
+				tmp.push_back('$');
+				tmp.push_back(*begin);
+				continue;
+			}
+			while (begin&&*begin != '}') {
 
 			}
 		}
@@ -71,7 +203,7 @@ bool AppLoaderEnvironment::DoEnvironmentSubst(std::wstring &str)
 	return true;
 }
 
-bool AppLoaderEnvironment::ExpendEnvironment(const std::wstring &key, std::wstring &value)
+bool AppLoaderEnvironment::QueryEnvironmentVariableU(const std::wstring &key, std::wstring &value)
 {
 	std::wstring ukey; /// convet to upper, and find it
 	std::transform(key.begin(), key.end(), ukey.begin(), ::toupper); 

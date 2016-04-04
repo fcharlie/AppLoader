@@ -17,6 +17,8 @@
 #include <memory.h>
 #include <tchar.h>
 
+
+
 #ifndef NOMINMAX                // Use the standard's templated min/max
 #define NOMINMAX
 #endif

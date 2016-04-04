@@ -19,16 +19,20 @@ public:
   const std::wstring &Executable() const { return executable_; }
   std::wstring &InitializeScript() { return initializeScript_; }
   const std::wstring &InitializeScript() const { return initializeScript_; }
-  const std::wstring &StartupDir()const { return startupDir_; }
+  const std::wstring &StartupDir() const { return startupDir_; }
   std::wstring &StartupDir() { return startupDir_; }
   std::vector<std::wstring> &Path() { return path_; }
   const std::vector<std::wstring> &Path() const { return path_; }
   std::vector<std::wstring> &Args() { return args_; }
   const std::vector<std::wstring> &Args() const { return args_; }
   void AppContainerEnable(bool isEnable = true) { isAppContainer = isEnable; }
-  bool IsEnableAppContainer() { return isAppContainer; }
+  bool IsEnableAppContainer() const { return isAppContainer; }
   void AdministratorEnable(bool isEnable = true) { isAdministrator = isEnable; }
-  bool IsEnableAdministrator() { return isAdministrator; }
+  bool IsEnableAdministrator() const { return isAdministrator; }
+  void ClearEnvironmentEnable(bool isEnable = true) {
+    isClearEnvironment = true;
+  }
+  bool IsClearEnvironment() const { return isClearEnvironment; }
   int Execute();
 
 private:
@@ -39,6 +43,9 @@ private:
   std::vector<std::wstring> args_;
   bool isAppContainer = false;
   bool isAdministrator = false;
+  bool isClearEnvironment = false;
 };
+
+bool StringEndWith(const std::wstring &s, const wchar_t *subfix);
 
 #endif

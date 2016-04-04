@@ -84,6 +84,14 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int) {
   int Argc = 0;
   wchar_t buf[4096];
   uint32_t counts;
+  //AppLoaderEnvironmentStrings aes;
+  //aes.InitializeEnvironment();
+  //aes.Replace(L"PATH", LR"(F:\Development\AppLoader;)");
+  //auto p = aes.EnvironmentBuilder(); 
+  //for (auto i = p; *i; i++) {
+	 // wprintf_s(L"Show %s\n", i);
+	 // i += wcslen(i);
+  //}
   FasterResolveIcon(LR"(F:\Development\AppLoader\App.apploader)", buf, &counts);
   AppLoaderEnvironment appLoaderEnvironment;
   appLoaderEnvironment.Initialize(LR"(App.apploader)");
