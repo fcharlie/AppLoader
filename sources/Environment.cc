@@ -26,6 +26,28 @@ inline void MemoryFree(void* ptr)
 	free(ptr);
 }
 
+
+/*
+ Build PATH Environment Variable
+*/
+bool EnvironmentPathBuilder(std::wstring &paths)
+{
+	WCHAR maxBuf[MAX_PATH] = { 0 };
+	auto ret=GetEnvironmentVariableW(L"WINDIR", maxBuf, MAX_PATH);
+	if (ret == 0)
+		return false;
+	paths.assign(maxBuf);
+	paths.append(L"\\System32;");
+	paths.append(maxBuf);
+	paths.push_back(';');
+	paths.append(maxBuf);
+	paths.append(L"\\System32\Wbem;");
+	paths.append(maxBuf);
+	paths.append(L"\\System32\\WindowsPowerShell\\v1.0;");
+	return true;
+}
+
+
 AppLoaderEnvironmentStrings::AppLoaderEnvironmentStrings() :envbuf(nullptr)
 {
 	///

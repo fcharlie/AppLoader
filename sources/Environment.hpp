@@ -44,6 +44,15 @@ private:
 	uint32_t lastBuilderCount=0;
 };
 
+/*
+* Default PATH
+* C:\Windows\System32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0
+*/
+
+///
+// Build PATH Environment Variable
+///
+bool EnvironmentPathBuilder(std::wstring &paths);
 
 /*
 * AppLoaderEnvironment , Allow AppLoader File support environment variables  
