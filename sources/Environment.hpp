@@ -54,6 +54,42 @@ private:
 ///
 bool EnvironmentPathBuilder(std::wstring &paths);
 
+class ArgumentBuilder {
+public:
+	~ArgumentBuilder()
+	{
+		if (Args_) {
+			free(Args_);
+		}
+	}
+	bool Initialize(const std::vector<std::wstring> &Argv)
+	{
+		if (Argv.empty()) {
+			Args_ = nullptr;
+			return false;
+		}
+		std::wstring wcmd;
+		for (auto &s : Argv) {
+			if (s.find(' ') < s.size()) {
+				wcmd.push_back('"');
+				wcmd.append(s);
+				wcmd.append(L"\" ");
+			} else {
+				wcmd.append(s);
+				wcmd.push_back(' ');
+			}
+		}
+		Args_ = _wcsdup(wcmd.data());
+		return (Args_ != nullptr); /// if failed out of memory
+	}
+	wchar_t *Args() { return this->Args_; }
+private:
+	wchar_t *Args_;
+};
+bool ArgvCombine(const std::vector<std::wstring> &argv, std::wstring &args);
+bool PathsCombine(const std::vector<std::wstring> &pathv, std::wstring &paths);
+BOOL WINAPI IsAdministrator();
+
 /*
 * AppLoaderEnvironment , Allow AppLoader File support environment variables  
 * AppRoot, AppLoader.apploader location directory

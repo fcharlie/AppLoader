@@ -49,6 +49,52 @@ bool EnvironmentPathBuilder(std::wstring &paths)
 	return true;
 }
 
+bool ArgvCombine(const std::vector<std::wstring> &argv, std::wstring &args)
+{
+	for (auto &a : argv) {
+		if (a.find(' ') < a.size()) {
+			args.push_back('"');
+			args.append(a);
+			args.append(L"\" ");
+		} else {
+			args.append(a);
+			args.push_back(' ');
+		}
+	}
+	return true;
+}
+
+bool PathsCombine(const std::vector<std::wstring> &pathv, std::wstring &paths)
+{
+	for (auto &p : pathv) {
+		paths.append(p);
+		paths.push_back(L';');
+	}
+	return true;
+}
+
+BOOL WINAPI IsAdministrator()
+{
+	BOOL b = FALSE;
+	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+	PSID AdministratorsGroup;
+	b = AllocateAndInitializeSid(
+		&NtAuthority,
+		2,
+		SECURITY_BUILTIN_DOMAIN_RID,
+		DOMAIN_ALIAS_RID_ADMINS,
+		0, 0, 0, 0, 0, 0,
+		&AdministratorsGroup);
+	if (b) {
+		if (!CheckTokenMembership(NULL, AdministratorsGroup, &b)) {
+			b = FALSE;
+		}
+		FreeSid(AdministratorsGroup);
+	}
+
+	return(b);
+}
+
 
 AppLoaderEnvironmentStrings::AppLoaderEnvironmentStrings() :envbuf(nullptr)
 {
