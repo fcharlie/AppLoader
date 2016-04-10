@@ -20,6 +20,17 @@ public:
 	bool Initialize()
 	{
 		wchar_t bom = 0xEFFF;
+		WCHAR buf[MAX_PATH];
+		auto dwRetVal = GetTempPathW(MAX_PATH, buf);
+		if (dwRetVal > MAX_PATH || dwRetVal == 0) {
+			return false;
+		}
+		path_.assign(buf);
+		auto uRetVal = GetTempFileNameW(path_.data(), L"AppLoader", 0, buf);
+		if (uRetVal == 0)
+			return false;
+		path_.assign(buf);
+		path_.append(L".ps1");
 		/// File Set size 0
 		return true;
 	}

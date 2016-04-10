@@ -27,8 +27,9 @@ BOOL WINAPI CreateElevatedProcess(LPCWSTR lpFile, LPCWSTR lpArgs,
                                   LPCWSTR lpEnvironment, LPCWSTR lpDirectory) {
   /// powershell -Command "&{ Start-Process -Verb runas -FilePath app.exe ....}"
   std::wstring cmdline(L"PowerShell -Command \"&{ Start-Process -Verb runas ");
-  cmdline.append(L"-FilePath ");
+  cmdline.append(L"-FilePath \"");
   cmdline.append(lpFile);
+  cmdline.append(L"\" ");
   if (lpArgs) {
     cmdline.append(L" -ArgumentList `\"");
     cmdline.append(lpArgs);
