@@ -24,7 +24,7 @@ private:
 };
 
 BOOL WINAPI CreateElevatedProcess(LPCWSTR lpFile, LPCWSTR lpArgs,
-                                 LPCWSTR lpEnvironment, LPCWSTR lpDirectory) {
+                                  LPCWSTR lpEnvironment, LPCWSTR lpDirectory) {
   /// powershell -Command "&{ Start-Process -Verb runas -FilePath app.exe ....}"
   std::wstring cmdline(L"PowerShell -Command \"&{ Start-Process -Verb runas ");
   cmdline.append(L"-FilePath ");
@@ -60,32 +60,25 @@ BOOL WINAPI CreateElevatedProcess(LPCWSTR lpFile, LPCWSTR lpArgs,
 int ProcessExecute(const ExecutableFile &file) {
   //
   AppLoaderEnvironmentStrings aes;
-  if (!aes.InitializeEnvironment()) {
-    return 1;
-  }
-  if (file.IsClearEnvironment()) {
-    std::wstring paths;
-    EnvironmentPathBuilder(paths);
-    aes.Replace(L"PATH", paths);
-  }
-  if (file.Path().size()) {
-    std::wstring paths;
-    for (auto &p : file.Path()) {
-      paths.append(p);
-      paths.push_back(L';');
-    }
-    aes.Insert(L"PATH", paths);
-  }
+  EnvironmentResolvePathEx(aes, file.Path(), file.IsClearEnvironment());
   BOOL result = FALSE;
   if (file.IsEnableAdministrator() && !IsAdministrator()) {
     std::wstring args;
-    ArgvCombine(file.Args(), args,kArgvPowerShell);
+    ArgvCombine(file.Args(), args, kArgvPowerShell);
     result = CreateElevatedProcess(
         file.Executable().data(), args.empty() ? nullptr : args.data(),
         aes.EnvironmentBuilder(),
         file.StartupDir().empty() ? nullptr : file.StartupDir().data());
   } else {
-	  ///
+    ArgvToCommandlineBuilder argvBuilder;
+    PROCESS_INFORMATION pi;
+    STARTUPINFOW si = {sizeof(STARTUPINFOW)};
+    auto lpDirectory = file.StartupDir().empty() ? nullptr : file.StartupDir().data();
+    argvBuilder.Initialize(file.Executable(), file.Args());
+    CreateProcessW(nullptr, argvBuilder.Args(), nullptr, nullptr, FALSE,
+                   CREATE_UNICODE_ENVIRONMENT,       ///
+                   (LPVOID)aes.EnvironmentBuilder(), ////
+                   lpDirectory, &si, &pi);
   }
   if (!result)
     return GetLastError();

@@ -40,6 +40,7 @@ private:
 	std::wstring path_;
 };
 
+
 //Start-Process -NoNewWindow -FilePath $cmd -Verb RunAs
 
 /*

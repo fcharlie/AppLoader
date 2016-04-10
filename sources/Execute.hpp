@@ -10,10 +10,28 @@
 #include "Executable.hpp"
 #endif
 
+class PSCmdlineBuilder {
+public:
+	PSCmdlineBuilder() :Args_(nullptr) {}
+	~PSCmdlineBuilder() {
+		if (Args_) {
+			free(Args_);
+		}
+	}
+	bool Initialize(const std::wstring &file,const std::vector<std::wstring> &argv,bool runas=false)
+	{
+		//
+		return false;
+	}
+private:
+	wchar_t *Args_;
+};
+
 BOOL WINAPI CreateElevatedProcess(LPCWSTR lpFile, LPCWSTR lpAgrs,
                                   LPCWSTR lpEnvironment, LPCWSTR lpDirectory);
+//
 BOOL WINAPI CreateAppContainerProcessEx(LPCWSTR lpApplication,
-                                        LPCWSTR lpCommandline,
+                                        LPWSTR lpCommandline,
                                         LPCWSTR lpEvnironment,
                                         LPCWSTR lpDirectory);
 int AppContainerExecute(const ExecutableFile &exe);

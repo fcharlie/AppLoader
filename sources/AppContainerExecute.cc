@@ -23,7 +23,6 @@
 
 class AppContainerContext {
 public:
-  // typedef std::vector<WELL_KNOWN_SID_TYPE> TCapabilityList;
   typedef std::vector<SID_AND_ATTRIBUTES> TCapabilitiesList;
   AppContainerContext() : appContainerSid(nullptr) {}
   ~AppContainerContext() {
@@ -94,14 +93,14 @@ private:
 };
 
 BOOL WINAPI CreateAppContainerProcessEx(LPCWSTR lpApplication,
-                                        LPCWSTR lpCommandline,
+                                        LPWSTR lpCommandline,
                                         LPCWSTR lpEvnironment,
                                         LPCWSTR lpDirectory) {
   AppContainerContext context;
   if (!context.AppContainerContextInitialize()) {
     return FALSE;
   }
-  PROCESS_INFORMATION pi;
+  PROCESS_INFORMATION pi ;
   STARTUPINFOEX siex = {sizeof(STARTUPINFOEX)};
   siex.StartupInfo.cb = sizeof(siex);
   SIZE_T cbAttributeListSize = 0;
@@ -122,15 +121,11 @@ BOOL WINAPI CreateAppContainerProcessEx(LPCWSTR lpApplication,
   if ((bReturn = UpdateProcThreadAttribute(
            siex.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES,
            &sc, sizeof(sc), NULL, NULL)) == FALSE) {
-	DeleteProcThreadAttributeList(siex.lpAttributeList);
+    DeleteProcThreadAttributeList(siex.lpAttributeList);
     return FALSE;
   }
-  auto len = wcslen(lpCommandline);
-  std::vector<wchar_t> cmdlinebuf(len + 1);
-  wmemcpy(cmdlinebuf.data(), lpCommandline, len);
-  cmdlinebuf[len] = L'\0';
   bReturn =
-      CreateProcessW(lpApplication, cmdlinebuf.data(), nullptr, nullptr, FALSE,
+      CreateProcessW(lpApplication, lpCommandline, nullptr, nullptr, FALSE,
                      EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT,
                      (LPVOID)lpEvnironment, lpDirectory,
                      reinterpret_cast<STARTUPINFOW *>(&siex), &pi);
@@ -138,32 +133,19 @@ BOOL WINAPI CreateAppContainerProcessEx(LPCWSTR lpApplication,
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
   }
-  auto x = GetLastError();
   DeleteProcThreadAttributeList(siex.lpAttributeList);
   return bReturn;
 }
 
 int AppContainerExecute(const ExecutableFile &exe) {
   AppLoaderEnvironmentStrings aes;
-  if (aes.InitializeEnvironment()) {
-    return 1;
-  }
-  if (exe.Path().size() > 0) {
-    std::wstring path_;
-    for (auto &p : exe.Path()) {
-      path_.append(p);
-      path_.push_back(';');
-    }
-    if (exe.IsClearEnvironment()) {
-      std::wstring paths;
-      if (!EnvironmentPathBuilder(paths))
-        return 1;
-      paths.append(path_);
-      aes.Replace(L"PATH", paths);
-    } else {
-      aes.Insert(L"PATH", path_);
-    }
-  }
-  /// TO USE Create Environment
+  EnvironmentResolvePathEx(aes, exe.Path(), exe.IsClearEnvironment());
+  ArgvToCommandlineBuilder argvBuilder;
+  argvBuilder.Initialize(exe.Executable(), exe.Args());
+  auto result = CreateAppContainerProcessEx(
+      nullptr, argvBuilder.Args(), aes.EnvironmentBuilder(),
+      exe.StartupDir().empty() ? nullptr : exe.StartupDir().data());
+  if (!result)
+    return GetLastError();
   return 0;
 }
