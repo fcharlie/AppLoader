@@ -75,8 +75,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\lib\AppLoader\AppLoader.cc" />
-    <ClCompile Include="..\..\lib\AppLoader\WideTOML.cc" />
+    <ClCompile Include="..\..\lib\AppLoader\AppLoaderFile.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\AppLoaderFile.h" />

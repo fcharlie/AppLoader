@@ -2,38 +2,56 @@
 ///
 ////
 ///
-#include <AppLoaderFile.h>
 #include <string>
 #include <windows.h>
 #include <algorithm>
+#include <tuple>
+////
 #include <AppLoaderFile.h>
 
 enum FileMemViewState {
 	kFileMemViewSuccess = 0,
 	kFileMemViewInvalidHandle,
 	kFileMemViewInvalidSize,
-	kFileMemAllocateOutOfMemory
+	kFileMemAllocateOutOfMemory,
+	kFileMemReadFailed
 };
 
+static uint16_t ByteSwap(uint16_t i)
+{
+	uint16_t j;
+	j = (i << 8);
+	j += (i >> 8);
+	return j;
+}
 
+static inline void ByteSwapShortBuffer(WCHAR *buffer, int len)
+{
+	int i;
+	uint16_t *sb = reinterpret_cast<uint16_t*>(buffer);
+	for (i = 0; i<len; i++)
+		sb[i] = ByteSwap(sb[i]);
+}
+
+struct BaseLine {
+	wchar_t *Ptr;
+	uint32_t n;
+};
 
 class AppLoaderFileMemView {
 public:
-	AppLoaderFileMemView() :hFile(nullptr)
+	AppLoaderFileMemView() :Ptr(nullptr)
 	{
 		///
 	}
 	~AppLoaderFileMemView()
 	{
-		if (hFile&&hFile != INVALID_HANDLE_VALUE) {
-			CloseHandle(hFile);
-		}
 		/// release
 	}
 	int FileMemViewStringMount(const wchar_t *file, size_t limitsize = 0x8000)
 	{
 		_ASSERT(file);
-		hFile = CreateFileW(file,
+		HANDLE hFile = CreateFileW(file,
 							GENERIC_READ,
 							FILE_SHARE_READ,
 							NULL,
@@ -47,111 +65,74 @@ public:
 			return kFileMemViewInvalidSize;
 		if (largeFile.QuadPart<4 || largeFile.QuadPart>limitsize)
 			return kFileMemViewInvalidSize;
+		size_t size = static_cast<size_t>(largeFile.QuadPart);
+		uint8_t *baseAddress = (uint8_t*)malloc(size+2);
+		if (baseAddress == nullptr) return kFileMemAllocateOutOfMemory;
+		baseAddress[size] = 0;
+		baseAddress[size + 1] = 0;
+		DWORD dwRead = 0;
+		if (!ReadFile(hFile, baseAddress, (DWORD)(size), &dwRead, nullptr)) {
+			CloseHandle(hFile);
+			free(baseAddress);
+			return kFileMemReadFailed;
+		}
+		if (baseAddress[0] == 0xFF && baseAddress[1] == 0xFE) { /// UTF16LE
+			Ptr = (wchar_t*)(baseAddress + 2);
+			raw = baseAddress;
+			end_=Ptr+dwRead/2-1;
+		} else if (baseAddress[0] == 0xFE && baseAddress[1] == 0xFF) { /// UTF16 BE
+			this->Ptr = (wchar_t*)(baseAddress + 2);
+			raw = baseAddress;
+			end_ = Ptr+dwRead / 2 - 1;
+			ByteSwapShortBuffer(this->Ptr, (dwRead - 2) / sizeof(wchar_t));
+		} else {
+			char *offsetPtr=(char*)baseAddress;
+			auto l = dwRead;
+			if (baseAddress[0]==0xEF&&baseAddress[1]==0xBB&&baseAddress[2]==0xBF) {
+				offsetPtr += 3;
+				l = l - 3;
+			}
+			auto len = MultiByteToWideChar(CP_UTF8, 0, const_cast<const char*>(offsetPtr), l, NULL, 0);
+			wchar_t *NewPtr = (wchar_t *)malloc(len*sizeof(wchar_t) + 1);
+			if (NewPtr==nullptr) {
+				CloseHandle(hFile);
+				free(baseAddress);
+				return kFileMemAllocateOutOfMemory;
+			}
+			NewPtr[len] = 0;
+			MultiByteToWideChar(CP_UTF8, 0, const_cast<const char*>(offsetPtr), l, NewPtr, len);
+			Ptr = NewPtr;
+			end_ = Ptr + len;
+			raw = NewPtr;
+			/// TO Convert
+		}
+		CloseHandle(hFile);
 		return kFileMemViewSuccess;
 	}
 private:
-	int ConvertFile()
-	{
-		return true;
-	}
-	HANDLE hFile;
+	void *raw;
 	wchar_t *Ptr;
-	size_t length;
+	wchar_t *end_;
 };
 
-//template<class CharT = wchar_t>
-//class AppLoaderChunk {
-//public:
-//	typedef std::iterator iterator;
-//	enum NewLineEnum {
-//		kLF,
-//		kCRLF,
-//		kCR
-//	};
-//	struct Line {
-//		CharT *data;
-//		size_t length;
-//		int newline;
-//	};
-//#define ZERO_LINE Line{0,0}
-//	AppLoaderChunk() {}
-//	wchar_t *begin()
-//	{
-//		return data;
-//	}
-//	wchar_t *end()
-//	{
-//		return data + count;
-//	}
-//	Line Next()
-//	{
-//		return ZERO_LINE;
-//	}
-//private:
-//	T *data;
-//	T *cur;
-//	size_t count;
-//};
-
 AppLoaderFile::AppLoaderFile(const wchar_t *file) : metafile(file) {
-	//
+	view = new AppLoaderFileMemView();
 }
-
+AppLoaderFile::~AppLoaderFile()
+{
+	if (view) {
+		delete view;
+	}
+}
 
 bool AppLoaderFile::Parse()
 {
-	///
+	if (view->FileMemViewStringMount(this->metafile)!=kFileMemViewSuccess)
+		return false;
 	return true;
 }
 
-bool FasterResolveIcon(const wchar_t *file, wchar_t *receive, uint32_t *counts)
-{
-	if (file == nullptr) {
-		return false;
-	}
-	WCHAR buffer[8192] = { 0 };
-	DWORD bytes = 0;
-	HANDLE hFile = CreateFileW(file, GENERIC_READ, FILE_SHARE_READ, NULL,
-							   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == NULL)
-		return false;
-	if (!ReadFile(hFile, buffer, 8192 * 2, &bytes, NULL)) {
-		return false;
-	}
-	auto n = bytes / 2;
-	wchar_t *p = buffer;
-	buffer[n] = L'\0';
-	for (auto i = 1; i < n; i++) {
-		if (buffer[i] == L'['&&buffer[i - 1] == '\n') {
-			if (wcscmp(&buffer[i], L"[Base]\r\n") == 0) {
-				p = &buffer[i] + 8;
-				break;
-			}
-			if (wcscmp(&buffer[i], L"[Base]\n") == 0) {
-				p = &buffer[i] + 7;
-				break;
-			}
-		}
-	}
-	if (p == buffer)
-		return false; /// not found section
-
-	return true;
-}
-
-
-
-
-
-int AppLoaderFile(const std::wstring &file) {
-  HANDLE hFile = CreateFileW(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
-                             OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  if (hFile == NULL)
-    return 1;
-  return 0;
-}
-
-BOOL WINAPI AppLoaderExtraIcon(LPCWSTR file, LPWSTR iconfile, DWORD counts) {
+BOOL WINAPI AppLoaderFilterIcon(LPCWSTR file, LPWSTR iconfile, DWORD counts) {
   WCHAR exe[4096];
   auto l =
       GetPrivateProfileStringW(L"Base", L"Executable", NULL, exe, 4096, file);

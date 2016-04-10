@@ -49,13 +49,22 @@ bool EnvironmentPathBuilder(std::wstring &paths)
 	return true;
 }
 
-bool ArgvCombine(const std::vector<std::wstring> &argv, std::wstring &args)
+bool ArgvCombine(const std::vector<std::wstring> &argv, std::wstring &args,int flags)
 {
 	for (auto &a : argv) {
 		if (a.find(' ') < a.size()) {
+			if (flags = kArgvPowerShell) {
+				args.push_back('`');
+			}
 			args.push_back('"');
 			args.append(a);
-			args.append(L"\" ");
+			if (flags = kArgvPowerShell) {
+				args.append(L"`\" ");
+			} else {
+				args.append(L"\" ");
+			}
+
+			
 		} else {
 			args.append(a);
 			args.push_back(' ');

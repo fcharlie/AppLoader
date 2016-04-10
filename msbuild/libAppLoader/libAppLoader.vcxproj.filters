@@ -15,10 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\lib\AppLoader\AppLoader.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\AppLoader\WideTOML.cc">
+    <ClCompile Include="..\..\lib\AppLoader\AppLoaderFile.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

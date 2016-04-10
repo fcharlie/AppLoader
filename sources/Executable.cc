@@ -45,3 +45,8 @@ int ExecutableFile::Execute() {
   }
   return ProcessExecute(*this);
 }
+
+bool ExecutableFile::ExecutableDeserialize(const std::wstring &appfile, ExecutableFile &exe)
+{
+	return true;
+}

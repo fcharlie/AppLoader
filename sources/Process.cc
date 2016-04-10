@@ -23,7 +23,7 @@ private:
   wchar_t *ptr_;
 };
 
-BOOL WINAPI ElevateCreateProcess(LPCWSTR lpFile, LPCWSTR lpArgs,
+BOOL WINAPI CreateElevatedProcess(LPCWSTR lpFile, LPCWSTR lpArgs,
                                  LPCWSTR lpEnvironment, LPCWSTR lpDirectory) {
   /// powershell -Command "&{ Start-Process -Verb runas -FilePath app.exe ....}"
   std::wstring cmdline(L"PowerShell -Command \"&{ Start-Process -Verb runas ");
@@ -79,8 +79,8 @@ int ProcessExecute(const ExecutableFile &file) {
   BOOL result = FALSE;
   if (file.IsEnableAdministrator() && !IsAdministrator()) {
     std::wstring args;
-    ArgvCombine(file.Args(), args);
-    result = ElevateCreateProcess(
+    ArgvCombine(file.Args(), args,kArgvPowerShell);
+    result = CreateElevatedProcess(
         file.Executable().data(), args.empty() ? nullptr : args.data(),
         aes.EnvironmentBuilder(),
         file.StartupDir().empty() ? nullptr : file.StartupDir().data());

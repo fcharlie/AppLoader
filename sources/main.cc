@@ -82,11 +82,9 @@ private:
 
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int) {
   int Argc = 0;
-  wchar_t buf[4096];
-  uint32_t counts;
-  //return true;
-  //ElevateCreateProcess(L"notepad",L"hello.txt", nullptr, nullptr);
-  FasterResolveIcon(LR"(F:\Development\AppLoader\App.apploader)", buf, &counts);
+  //CreateAppContainerProcessEx(nullptr, L"cmd", nullptr, nullptr);
+  AppLoaderFile file(LR"(F:\Development\AppLoader\App.apploader)");
+  file.Parse();
   AppLoaderEnvironment appLoaderEnvironment;
   appLoaderEnvironment.Initialize(LR"(App.apploader)");
   ArgvCase argvCase = CommandLineToArgvW(GetCommandLineW(), &Argc);

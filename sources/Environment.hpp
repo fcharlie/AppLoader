@@ -86,7 +86,14 @@ public:
 private:
 	wchar_t *Args_;
 };
-bool ArgvCombine(const std::vector<std::wstring> &argv, std::wstring &args);
+
+enum ArgvCombineFlags {
+	kArgvPowerShell,
+	kArgvBatch,
+	kArgvNative
+};
+
+bool ArgvCombine(const std::vector<std::wstring> &argv, std::wstring &args,int flags);
 bool PathsCombine(const std::vector<std::wstring> &pathv, std::wstring &paths);
 BOOL WINAPI IsAdministrator();
 

@@ -1,0 +1,18 @@
+// AppLoaderHandle.idl : IDL source for AppLoaderHandle
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AppLoaderHandleX.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(EF47CB50-8DF8-42CC-9B2E-265C5D12EB37),
+	version(1.0),
+]
+library AppLoaderHandleLib
+{
+	importlib("stdole2.tlb");
+};
+

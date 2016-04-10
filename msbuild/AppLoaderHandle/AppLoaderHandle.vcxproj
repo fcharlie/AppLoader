@@ -90,6 +90,9 @@
       <Project>{59c004e6-2edf-4ab7-8683-781047206544}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\lib\AppLoaderHandle\AppLoaderHandle.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
