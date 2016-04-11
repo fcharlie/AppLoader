@@ -108,7 +108,7 @@ class AppLoaderEnvironment {
 public:
   AppLoaderEnvironment();
   bool Initialize(const wchar_t *alfile);
-  bool DoEnvironmentSubst(std::wstring &str);
+  bool DoEnvironmentSubstW(std::wstring &str);
   bool QueryEnvironmentVariableU(const std::wstring &key, std::wstring &value);
 
 private:

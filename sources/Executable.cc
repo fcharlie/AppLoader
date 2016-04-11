@@ -6,7 +6,8 @@
 ///
 #include <algorithm>
 #include <regex>
-
+//
+#include "Environment.hpp"
 #include "Executable.hpp"
 #include "Execute.hpp"
 
@@ -48,5 +49,9 @@ int ExecutableFile::Execute() {
 
 bool ExecutableFile::ExecutableDeserialize(const std::wstring &appfile,
                                            ExecutableFile &exe) {
+  AppLoaderEnvironment appenv;
+  appenv.Initialize(appfile.data());
+  appenv.DoEnvironmentSubstW(exe.executable_);
+  
   return true;
 }

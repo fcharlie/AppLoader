@@ -208,38 +208,141 @@ bool AppLoaderEnvironment::Initialize(const wchar_t *alfile) {
   if (hr == S_OK) {
     builtEnv.insert(std::pair<std::wstring, std::wstring>(L"APPROOT", buf));
   }
-  ////
+  //// TO add more environment
   return true;
 }
+enum KEnvStateMachine : int {
+  kClearReset = 0,
+  kEscapeAllow = 1,
+  kMarkAllow = 2,
+  kBlockBegin = 3,
+  kBlockEnd = 4
+};
 
-bool AppLoaderEnvironment::DoEnvironmentSubst(std::wstring &str) {
-  std::wstring tmp;
-  std::wstring key;
-  // raw Pointer
-  auto begin = str.data();
-  auto end = begin + str.size();
-  for (; begin < end; begin++) {
-    if (*begin == '$') {
-      if (++begin >= end) {
-        return false;
-      }
-      if (*begin != '{') {
-        tmp.push_back('$');
-        tmp.push_back(*begin);
+bool AppLoaderEnvironment::DoEnvironmentSubstW(std::wstring &str) {
+  if (str.empty())
+    return false;
+  std::wstring ns, ks;
+  auto p = str.c_str();
+  auto n = str.size();
+  int pre = 0;
+  size_t i = 0;
+  KEnvStateMachine state = kClearReset;
+  for (; i < n; i++) {
+    switch (p[i]) {
+    case '`': {
+      switch (state) {
+      case kClearReset:
+        state = kEscapeAllow;
+        break;
+      case kEscapeAllow:
+        ns.push_back('`');
+        state = kClearReset;
+        break;
+      case kMarkAllow:
+        state = kEscapeAllow;
+        ns.push_back('$');
+        break;
+      case kBlockBegin:
+        continue;
+      default:
+        ns.push_back('`');
         continue;
       }
-      while (begin && *begin != '}') {
+    } break;
+    case '$': {
+      switch (state) {
+      case kClearReset:
+        state = kMarkAllow;
+        break;
+      case kEscapeAllow:
+        ns.push_back('$');
+        state = kClearReset;
+        break;
+      case kMarkAllow:
+        ns.push_back('$');
+        state = kClearReset;
+        break;
+      case kBlockBegin:
+      case kBlockEnd:
+      default:
+        ns.push_back('$');
+        continue;
       }
+    } break;
+    case '{': {
+      switch (state) {
+      case kClearReset:
+      case kEscapeAllow:
+        ns.push_back('{');
+        state = kClearReset;
+        break;
+      case kMarkAllow: {
+        state = kBlockBegin;
+        pre = i;
+      } break;
+      case kBlockBegin:
+        ns.push_back('{');
+        break;
+      default:
+        continue;
+      }
+    } break;
+    case '}': {
+      switch (state) {
+      case kClearReset:
+      case kEscapeAllow:
+        ns.push_back('}');
+        state = kClearReset;
+        break;
+      case kMarkAllow:
+        state = kClearReset;
+        ns.push_back('$');
+        ns.push_back('}');
+        break;
+      case kBlockBegin: {
+        ks.assign(&p[pre + 1], i - pre - 1);
+        std::wstring v;
+        if (QueryEnvironmentVariableU(ks, v))
+          ns.append(v);
+        state = kClearReset;
+      } break;
+      default:
+        continue;
+      }
+    } break;
+    default: {
+      switch (state) {
+      case kClearReset:
+        ns.push_back(p[i]);
+        break;
+      case kEscapeAllow:
+        ns.push_back('`');
+        ns.push_back(p[i]);
+        state = kClearReset;
+        break;
+      case kMarkAllow:
+        ns.push_back('$');
+        ns.push_back(p[i]);
+        state = kClearReset;
+        break;
+      case kBlockBegin:
+      default:
+        continue;
+      }
+    } break;
     }
-    tmp.push_back(*begin);
   }
+  str.assign(ns);
   return true;
 }
 
 bool AppLoaderEnvironment::QueryEnvironmentVariableU(const std::wstring &key,
                                                      std::wstring &value) {
   std::wstring ukey; /// convet to upper, and find it
-  std::transform(key.begin(), key.end(), ukey.begin(), ::toupper);
+  for (auto c : key) {
+	  ukey.push_back(::toupper(c));
+  }
   auto iter = builtEnv.find(ukey);
   if (iter != builtEnv.end()) {
     value.assign(iter->second);

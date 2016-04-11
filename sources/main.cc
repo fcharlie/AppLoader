@@ -83,9 +83,11 @@ private:
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 {
   int Argc = 0;
-  std::vector<std::wstring> args = { L"Fuck your.txt" };
-  PSProcessElevatedBuilder(L"notepad",args, nullptr, nullptr);
-  //CreateAppContainerProcessEx(nullptr, L"cmd", nullptr, nullptr);
+  AppLoaderEnvironment aenv;
+  aenv.Initialize(LR"(F:\Development\AppLoader\App.apploader)");
+  std::wstring w(L"${TEMP}\\App.Apploader");
+  aenv.DoEnvironmentSubstW(w);
+  MessageBoxW(nullptr, w.data(), L"AppRoot", MB_OK);
   AppLoaderFile file(LR"(F:\Development\AppLoader\App.apploader)");
   file.Parse();
   AppLoaderEnvironment appLoaderEnvironment;
