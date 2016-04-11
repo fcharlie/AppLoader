@@ -89,7 +89,7 @@
     <ClCompile Include="..\..\sources\Environment.cc" />
     <ClCompile Include="..\..\sources\Executable.cc" />
     <ClCompile Include="..\..\sources\main.cc" />
-    <ClCompile Include="..\..\sources\PowerShellExecute.cc" />
+    <ClCompile Include="..\..\sources\PSExecute.cc" />
     <ClCompile Include="..\..\sources\Precompiled.cc" />
     <ClCompile Include="..\..\sources\Process.cc" />
   </ItemGroup>

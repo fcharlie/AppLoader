@@ -31,22 +31,22 @@ inline bool IsMatchPowerShell(const std::wstring &script) {
 }
 
 int ExecutableFile::Execute() {
+  if (isAppContainer) {
+    return AppContainerExecute(*this);
+  }
   if (initializeScript_.size() > 0) {
     if (IsMatchBatch(initializeScript_)) {
       /// to execute Batch
       return BatchAttachExecute(*this);
     } else if (IsMatchPowerShell(initializeScript_)) {
       /// to execute PowerShell
-      return PowerShellAttachExecute(*this);
+      return PSAttachExecute(*this);
     }
-  }
-  if (isAppContainer) {
-    return AppContainerExecute(*this);
   }
   return ProcessExecute(*this);
 }
 
-bool ExecutableFile::ExecutableDeserialize(const std::wstring &appfile, ExecutableFile &exe)
-{
-	return true;
+bool ExecutableFile::ExecutableDeserialize(const std::wstring &appfile,
+                                           ExecutableFile &exe) {
+  return true;
 }

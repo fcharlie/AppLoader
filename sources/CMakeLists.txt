@@ -5,7 +5,7 @@ add_executable(AppLoader WIN32
     AppContainerExecute.cc
     Precompiled.cc
     BatchExecute.cc
-    PowerShellExecute.cc
+    PSExecute.cc
     Executable.cc
 	Environment.cc
     Process.cc

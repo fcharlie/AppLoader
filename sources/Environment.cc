@@ -42,29 +42,6 @@ bool EnvironmentPathBuilder(std::wstring &paths) {
   return true;
 }
 
-bool ArgvCombine(const std::vector<std::wstring> &argv, std::wstring &args,
-                 int flags) {
-  for (auto &a : argv) {
-    if (a.find(' ') < a.size()) {
-      if (flags == kArgvPowerShell) {
-        args.push_back('`');
-      }
-      args.push_back('"');
-      args.append(a);
-      if (flags == kArgvPowerShell) {
-        args.append(L"`\" ");
-      } else {
-        args.append(L"\" ");
-      }
-
-    } else {
-      args.append(a);
-      args.push_back(' ');
-    }
-  }
-  return true;
-}
-
 bool PathsCombine(const std::vector<std::wstring> &pathv, std::wstring &paths) {
   for (auto &p : pathv) {
     paths.append(p);

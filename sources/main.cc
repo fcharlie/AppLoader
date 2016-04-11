@@ -1,11 +1,11 @@
 //
 //
 //
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <vector>
-#include <windows.h>
+
+///
+#include "Precompiled.h"
+///
+#include <shellapi.h>
 ///
 #include <AppLoader.h>
 #include <AppLoaderFile.h>
@@ -80,8 +80,11 @@ private:
   LPWSTR *Argv_;
 };
 
-int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int) {
+int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
+{
   int Argc = 0;
+  std::vector<std::wstring> args = { L"Fuck your.txt" };
+  PSProcessElevatedBuilder(L"notepad",args, nullptr, nullptr);
   //CreateAppContainerProcessEx(nullptr, L"cmd", nullptr, nullptr);
   AppLoaderFile file(LR"(F:\Development\AppLoader\App.apploader)");
   file.Parse();

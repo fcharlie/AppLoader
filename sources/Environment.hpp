@@ -12,7 +12,7 @@
 // max # of characters we support using the "\\?\" syntax
 // (0x7FFF + 1 for NULL terminator)
 #ifndef PATHCCH_MAX_CCH
-#define PATHCCH_MAX_CCH
+#define PATHCCH_MAX_CCH 0x8000
 #endif
 
 #ifndef CREATE_UNICODE_ENVIRONMENT
@@ -97,10 +97,6 @@ private:
   wchar_t *Args_;
 };
 
-enum ArgvCombineFlags { kArgvPowerShell, kArgvBatch, kArgvNative };
-
-bool ArgvCombine(const std::vector<std::wstring> &argv, std::wstring &args,
-                 int flags);
 bool PathsCombine(const std::vector<std::wstring> &pathv, std::wstring &paths);
 BOOL WINAPI IsAdministrator();
 

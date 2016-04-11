@@ -52,8 +52,10 @@ public:
   ~BatchFileBuilder() {
     if (hFile != nullptr && hFile != INVALID_HANDLE_VALUE) {
       CloseHandle(hFile);
-      DeleteFileW(path_.c_str());
     }
+	if (initialized) {
+		DeleteFileW(path_.data());
+	}
   }
   bool Initialize() {
     WCHAR buf[MAX_PATH];
@@ -62,12 +64,9 @@ public:
       return false;
     }
     path_.assign(buf);
-    auto uRetVal = GetTempFileNameW(path_.data(), L"AppLoader", 0, buf);
-    if (uRetVal == 0)
-      return false;
+	swprintf_s(buf, L"%sAppLoaderBatch.%d.bat", path_.data(), GetCurrentThreadId());
     path_.assign(buf);
-    path_.append(L".bat");
-    HANDLE hFile = CreateFileW(path_.data(),          // file name
+    hFile = CreateFileW(path_.data(),          // file name
                                GENERIC_WRITE,         // open for write
                                0,                     // do not share
                                NULL,                  // default security
@@ -77,6 +76,7 @@ public:
     if (hFile == INVALID_HANDLE_VALUE) {
       return false;
     }
+	initialized = true;
     return true;
   }
   DWORD Write(const char *text, DWORD size) {
@@ -87,11 +87,14 @@ public:
     return 0;
   }
   const wchar_t *Path() { return path_.c_str(); }
-  void Flush() { FlushFileBuffers(hFile); }
+  void Flush() {
+	  CloseHandle(hFile);
+  }
 
 private:
   HANDLE hFile;
   std::wstring path_;
+  bool initialized = false;
 };
 
 int BatchAttachExecute(const ExecutableFile &exe) {
