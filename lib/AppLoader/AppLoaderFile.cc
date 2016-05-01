@@ -137,7 +137,7 @@ AppLoaderFile::~AppLoaderFile() {
 
 inline bool StringCaseCompareWhitespace(const std::wstring &cstr,
                                         wchar_t *begin, wchar_t *end) {
-  if (end - begin < cstr.size())
+  if ((size_t)(end - begin) < cstr.size())
     return false;
   wchar_t l, f;
   auto iter = begin;
