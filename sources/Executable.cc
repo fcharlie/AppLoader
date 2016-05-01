@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <regex>
 //
+#include "AppLoaderFile.h"
 #include "Environment.hpp"
 #include "Executable.hpp"
 #include "Execute.hpp"
@@ -51,7 +52,69 @@ bool ExecutableFile::ExecutableDeserialize(const std::wstring &appfile,
                                            ExecutableFile &exe) {
   AppLoaderEnvironment appenv;
   appenv.Initialize(appfile.data());
+  /*
+   TO init
+  */
+  AppLoaderFile file(appfile.c_str());
+  if (!file.Parse())
+    return false;
+  auto iter = file.Objects().begin();
+  //// Exe Name
+  if ((iter = file.At(L"Base.Executable")) != file.ObjectEnd()) {
+    if (iter->second.IsString()) {
+      exe.executable_.assign(iter->second.AsString());
+    }
+  }
+
+  if ((iter = file.At(L"Base.InitializeScript")) != file.ObjectEnd()) {
+    if (iter->second.IsString()) {
+      exe.initializeScript_.assign(iter->second.AsString());
+    }
+  }
+  if ((iter = file.At(L"Base.StartupDir")) != file.ObjectEnd()) {
+    if (iter->second.IsString()) {
+      exe.startupDir_.assign(iter->second.AsString());
+    }
+  }
+  ///// Boolean value set
+  if ((iter = file.At(L"Base.IsAdministrator")) != file.ObjectEnd()) {
+    if (iter->second.IsBoolean()) {
+      exe.isAdministrator = iter->second.AsBoolean();
+    }
+  }
+  if ((iter = file.At(L"Base.IsAppContainer")) != file.ObjectEnd()) {
+    if (iter->second.IsBoolean()) {
+      exe.isAppContainer = iter->second.AsBoolean();
+    }
+  }
+  if ((iter = file.At(L"Base.IsClearEnvironment")) != file.ObjectEnd()) {
+    if (iter->second.IsBoolean()) {
+      exe.isClearEnvironment = iter->second.AsBoolean();
+    }
+  }
+
+  //// Array
+  if ((iter = file.At(L"Base.Path")) != file.ObjectEnd()) {
+    if (iter->second.IsArray()) {
+      auto obj = iter->second;
+      for (auto &o : obj) {
+		  if (o.IsString()&&o.AsString().size()) {
+          exe.path_.push_back(o.AsString());
+        }
+      }
+    }
+  }
+  if ((iter = file.At(L"Base.Args")) != file.ObjectEnd()) {
+    if (iter->second.IsArray()) {
+      auto obj = iter->second;
+      for (auto &o : obj) {
+        if (o.IsString()&&o.AsString().size()) {
+          exe.args_.push_back(o.AsString());
+        }
+      }
+    }
+  }
+
   appenv.DoEnvironmentSubstW(exe.executable_);
-  
   return true;
 }

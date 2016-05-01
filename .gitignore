@@ -10,6 +10,7 @@ build/
 # Precompiled Headers
 *.gch
 *.pch
+*.vcxproj.user
 
 # Compiled Dynamic libraries
 *.so

@@ -19,6 +19,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 include_directories(
     include
+	vendor/rapidjson/include
 )
 
 add_subdirectory(lib)

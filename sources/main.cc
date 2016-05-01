@@ -11,9 +11,9 @@
 #include <AppLoaderFile.h>
 
 ///
+#include "Environment.hpp"
 #include "Executable.hpp"
 #include "Execute.hpp"
-#include "Environment.hpp"
 
 void PrintUsage() {
   ///
@@ -80,18 +80,9 @@ private:
   LPWSTR *Argv_;
 };
 
-int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
-{
+int ParseAppLoaderFileStream(const std::wstring &str);
+int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int) {
   int Argc = 0;
-  AppLoaderEnvironment aenv;
-  aenv.Initialize(LR"(F:\Development\AppLoader\App.apploader)");
-  std::wstring w(L"${TEMP}\\App.Apploader");
-  aenv.DoEnvironmentSubstW(w);
-  MessageBoxW(nullptr, w.data(), L"AppRoot", MB_OK);
-  AppLoaderFile file(LR"(F:\Development\AppLoader\App.apploader)");
-  file.Parse();
-  AppLoaderEnvironment appLoaderEnvironment;
-  appLoaderEnvironment.Initialize(LR"(App.apploader)");
   ArgvCase argvCase = CommandLineToArgvW(GetCommandLineW(), &Argc);
   if (Argc < 2) {
     PrintUsage();
@@ -115,6 +106,9 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
   for (auto &c : Case.file) {
     //// Parse C
     ExecutableFile executableFile;
+    if (ExecutableFile::ExecutableDeserialize(c, executableFile)) {
+      executableFile.Execute();
+    }
     //....
     // executableFile.Execute();
   }

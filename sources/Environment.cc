@@ -2,6 +2,8 @@
 ///
 #include "Precompiled.h"
 //
+#include <stdlib.h> // size_t, malloc, free
+#include <new> // bad_alloc, bad_array_new_length
 #include <Pathcch.h>
 #include <Shlobj.h>
 #include <Shlwapi.h>
@@ -10,6 +12,34 @@
 #include <algorithm>
 ///
 #include "Environment.hpp"
+
+#if defined(_MSC_VER) &&_MSC_VER <=1800 && __cplusplus<201103L
+#define noexcept
+#endif
+
+template <class T> struct Mallocator {
+	typedef T value_type;
+	Mallocator() noexcept{} // default ctor not required
+		template <class U> Mallocator(const Mallocator<U>&) noexcept{}
+		template <class U> bool operator==(
+		const Mallocator<U>&) const noexcept{ return true; }
+		template <class U> bool operator!=(
+		const Mallocator<U>&) const noexcept{ return false; }
+
+		T * allocate(const size_t n) const
+	{
+		if (n == 0) { return nullptr; }
+		if (n > static_cast<size_t>(-1) / sizeof(T)) {
+			throw std::bad_array_new_length();
+		}
+		void * const pv = malloc(n * sizeof(T));
+		if (!pv) { throw std::bad_alloc(); }
+		return static_cast<T *>(pv);
+	}
+	void deallocate(T * const p, size_t) const noexcept{
+		free(p);
+	}
+};
 
 template <class TBase> inline TBase *ZeroMemoryAlloc(size_t n) {
   TBase *Ptr = reinterpret_cast<TBase *>(malloc(sizeof(TBase) * n));
