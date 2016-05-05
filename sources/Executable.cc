@@ -116,5 +116,7 @@ bool ExecutableFile::ExecutableDeserialize(const std::wstring &appfile,
   }
 
   appenv.DoEnvironmentSubstW(exe.executable_);
+  appenv.DoEnvironmentSubstW(exe.startupDir_);
+  appenv.DoEnvironmentSubstW(exe.initializeScript_);
   return true;
 }
