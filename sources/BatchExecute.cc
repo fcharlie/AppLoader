@@ -89,6 +89,7 @@ public:
   const wchar_t *Path() { return path_.c_str(); }
   void Flush() {
 	  CloseHandle(hFile);
+	  hFile = nullptr;
   }
 
 private:

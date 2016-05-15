@@ -62,13 +62,13 @@ bool EnvironmentPathBuilder(std::wstring &paths) {
   if (ret == 0)
     return false;
   paths.assign(maxBuf);
-  paths.append(L"\\System32;");
+  paths.append(LR"(\System32;)");
   paths.append(maxBuf);
   paths.push_back(';');
   paths.append(maxBuf);
-  paths.append(L"\\System32\\Wbem;");
+  paths.append(LR"(\System32\Wbem;)");
   paths.append(maxBuf);
-  paths.append(L"\\System32\\WindowsPowerShell\\v1.0;");
+  paths.append(LR"(\System32\WindowsPowerShell\v1.0;)");
   return true;
 }
 

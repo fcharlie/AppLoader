@@ -80,7 +80,6 @@ private:
   LPWSTR *Argv_;
 };
 
-int ParseAppLoaderFileStream(const std::wstring &str);
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int) {
   int Argc = 0;
   ArgvCase argvCase = CommandLineToArgvW(GetCommandLineW(), &Argc);
