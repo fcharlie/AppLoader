@@ -44,6 +44,9 @@ public:
   }
   ~AppLoaderFileMemView() {
     /// release
+	if(raw){
+		free(raw);
+	}
   }
   int FileMemViewStringMount(const wchar_t *file, size_t limitsize = 0x8000) {
     _ASSERT(file);
