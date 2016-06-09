@@ -23,9 +23,18 @@
     <ClCompile Include="..\..\lib\AppLoaderHandle\AppLoaderHandle.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\lib\AppLoaderHandle\AppDiscoverICON.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\AppLoaderHandle\Precompiled.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\lib\AppLoaderHandle\AppLoaderHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\AppLoaderHandle\Precompiled.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
