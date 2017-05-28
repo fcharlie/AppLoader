@@ -39,16 +39,14 @@ struct FlowLine {
 
 class AppLoaderFileMemView {
 public:
-  AppLoaderFileMemView() : Ptr(nullptr) {
-    ///
-  }
+	AppLoaderFileMemView() = default;
   ~AppLoaderFileMemView() {
     /// release
 	if(raw){
 		free(raw);
 	}
   }
-  int FileMemViewStringMount(const wchar_t *file, size_t limitsize = 0x8000) {
+  int FileMemViewStringMount(const wchar_t *file, size_t limitsize = MAXSIZEFILE) {
     _ASSERT(file);
     HANDLE hFile = CreateFileW(file, GENERIC_READ, FILE_SHARE_READ, NULL,
                                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -90,18 +88,18 @@ public:
       }
       auto len = MultiByteToWideChar(
           CP_UTF8, 0, const_cast<const char *>(offsetPtr), l, NULL, 0);
-      wchar_t *NewPtr = (wchar_t *)malloc(len * sizeof(wchar_t) + 1);
+	  wchar_t *NewPtr = (wchar_t *)malloc((len + 1)* sizeof(wchar_t));
       if (NewPtr == nullptr) {
         CloseHandle(hFile);
         free(baseAddress);
         return kFileMemAllocateOutOfMemory;
       }
-      NewPtr[len] = 0;
       MultiByteToWideChar(CP_UTF8, 0, const_cast<const char *>(offsetPtr), l,
                           NewPtr, len);
       Ptr = NewPtr;
       end_ = Ptr + len;
       raw = NewPtr;
+	  free(baseAddress);
       /// TO Convert
     }
     CloseHandle(hFile);
@@ -124,9 +122,9 @@ public:
   }
 
 private:
-  void *raw;
-  wchar_t *Ptr;
-  wchar_t *end_;
+  void *raw = nullptr;
+  wchar_t *Ptr=nullptr;
+  wchar_t *end_=nullptr;
 };
 
 AppLoaderFile::AppLoaderFile(const wchar_t *file) : metafile(file) {

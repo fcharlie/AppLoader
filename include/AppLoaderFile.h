@@ -15,6 +15,8 @@
 class Object;
 class AppLoaderFile;
 
+#define MAXSIZEFILE (1UL<<20)
+
 class Object {
 public:
   enum ObjectType {

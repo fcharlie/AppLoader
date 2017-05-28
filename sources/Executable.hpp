@@ -38,7 +38,7 @@ public:
   }
   bool IsClearEnvironment() const { return isClearEnvironment; }
   int Execute();
-  static bool ExecutableDeserialize(const std::wstring &appfile, ExecutableFile &exe);
+  static bool Deserialize(const std::wstring &appfile, ExecutableFile &exe);
 private:
   std::wstring executable_;
   std::wstring initializeScript_;

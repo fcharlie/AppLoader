@@ -48,7 +48,7 @@ int ExecutableFile::Execute() {
   return ProcessExecute(*this);
 }
 
-bool ExecutableFile::ExecutableDeserialize(const std::wstring &appfile,
+bool ExecutableFile::Deserialize(const std::wstring &appfile,
                                            ExecutableFile &exe) {
   AppLoaderEnvironment appenv;
   appenv.Initialize(appfile.data());

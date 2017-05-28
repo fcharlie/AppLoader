@@ -105,7 +105,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int) {
   for (auto &c : Case.file) {
     //// Parse C
     ExecutableFile executableFile;
-    if (ExecutableFile::ExecutableDeserialize(c, executableFile)) {
+    if (ExecutableFile::Deserialize(c, executableFile)) {
       executableFile.Execute();
     }
     //....
